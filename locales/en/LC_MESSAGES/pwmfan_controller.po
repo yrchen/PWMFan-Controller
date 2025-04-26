@@ -1,0 +1,111 @@
+# English translations for PWM Fan Controller.
+# Copyright (C) 2025 Xaver Y.R. Chen
+# This file is distributed under the same license as the PWM Fan Controller package.
+# Automatically generated, DO NOT EDIT BY HAND unless you know what you are doing.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PWM Fan Controller v1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-26 13:20+0800\n"
+"PO-Revision-Date: 2025-04-26 12:56:20+0800\n"
+"Last-Translator: Xaver Y.R. Chen <yrchen@ATCity.org>\n"
+"Language-Team: English <en-team>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/pwm_fan_controller.py:76
+msgid "Configuration file missing 'temperature_to_duty', using default curve"
+msgstr ""
+
+#: src/pwm_fan_controller.py:80
+#, python-brace-format
+msgid "Successfully loaded configuration file: {config_file}"
+msgstr ""
+
+#: src/pwm_fan_controller.py:83
+#, python-brace-format
+msgid "Failed to load configuration file: {error}, using default curve"
+msgstr ""
+
+#: src/pwm_fan_controller.py:99
+msgid "PWM is not enabled (enable file is not 1)"
+msgstr ""
+
+#: src/pwm_fan_controller.py:102
+#, python-brace-format
+msgid "Failed to check PWM status: {error}"
+msgstr ""
+
+#: src/pwm_fan_controller.py:111
+msgid "Starting Auto Mode"
+msgstr ""
+
+#: src/pwm_fan_controller.py:127
+#, python-brace-format
+msgid "Temperature: {temp:.1f}°C => Setting duty cycle to {duty}%"
+msgstr ""
+
+#: src/pwm_fan_controller.py:132
+#, python-brace-format
+msgid "Updating duty cycle to {duty}%"
+msgstr ""
+
+#: src/pwm_fan_controller.py:137
+#, python-brace-format
+msgid "Error in auto mode: {error}"
+msgstr ""
+
+#: src/pwm_fan_controller.py:143
+msgid "PWM Fan Smart Controller (auto-loads config)"
+msgstr ""
+
+#: src/pwm_fan_controller.py:144
+msgid "Select mode: auto or manual"
+msgstr ""
+
+#: src/pwm_fan_controller.py:145
+msgid "Temperature check interval in seconds (auto mode)"
+msgstr ""
+
+#: src/pwm_fan_controller.py:146
+msgid "Enable verbose logging output"
+msgstr ""
+
+#: src/pwm_fan_controller.py:157
+msgid "PWM device not found. Please ensure pwm0 is exported and enabled!"
+msgstr ""
+
+#: src/pwm_fan_controller.py:164
+#, python-brace-format
+msgid "PWM period: {period} ns"
+msgstr ""
+
+#: src/pwm_fan_controller.py:168
+msgid "Received interrupt signal, terminating program."
+msgstr ""
+
+#: src/pwm_fan_controller.py:177
+msgid "Starting Manual Mode"
+msgstr ""
+
+#: src/pwm_fan_controller.py:181
+msgid "Set duty cycle (%) > "
+msgstr ""
+
+#: src/pwm_fan_controller.py:185
+#, python-brace-format
+msgid "Manually setting duty cycle to {percent}%"
+msgstr ""
+
+#: src/pwm_fan_controller.py:188
+msgid "Please enter a valid number!"
+msgstr ""
+
+#: src/pwm_fan_controller.py:191
+#, python-brace-format
+msgid "Error in manual mode: {error}"
+msgstr ""
