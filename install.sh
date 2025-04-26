@@ -12,11 +12,11 @@ echo "[1/4] Installing main script..."
 sudo install -m 755 "${SCRIPT_DIR}/src/pwm_fan_controller.py" "${BIN_TARGET}"
 
 echo "[2/4] Installing systemd service..."
-sudo install -m 644 "${SCRIPT_DIR}/systemd/pwmfan.service" "${SERVICE_TARGET}"
+sudo install -m 644 "${SCRIPT_DIR}/etc/systemd/pwmfan.service" "${SERVICE_TARGET}"
 
 echo "[3/4] Installing configuration file..."
 if [ ! -f "${CONFIG_TARGET}" ]; then
-    sudo install -m 644 "${SCRIPT_DIR}/pwmfan_config.json" "${CONFIG_TARGET}"
+    sudo install -m 644 "${SCRIPT_DIR}/etc/pwmfan_config.json" "${CONFIG_TARGET}"
     echo "New configuration file created: ${CONFIG_TARGET}"
 else
     echo "Existing configuration file detected, keeping current version: ${CONFIG_TARGET}"
