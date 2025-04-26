@@ -9,7 +9,7 @@ import signal
 import time
 
 # Version Information
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 # Setup localization
 APP_NAME = "pwmfan_controller"
@@ -41,6 +41,7 @@ DEFAULT_CONFIG = {
     "pwm_path": "/sys/class/pwm/pwmchip0/pwm0",
     "temp_sensor_path": "/sys/class/thermal/thermal_zone0/temp",
     "interval": 10,
+    "verbose": True,
     "temperature_to_duty": [
         {"temp": 45, "duty": 0},
         {"temp": 50, "duty": 10},
