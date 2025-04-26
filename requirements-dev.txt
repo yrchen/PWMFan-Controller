@@ -1,0 +1,7 @@
+# Development dependencies based on .pre-commit-config.yaml
+djlint==1.36.4  # https://github.com/Riverside-Healthcare/djLint
+pre-commit==4.2.0  # https://github.com/pre-commit/pre-commit
+black==25.1.0  # https://github.com/psf/black
+isort==6.0.1  # https://github.com/PyCQA/isort
+flake8==7.1.2  # https://github.com/pycqa/flake8
+flake8-isort  # https://github.com/PyCQA/flake8-isort
