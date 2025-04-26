@@ -1,0 +1,6 @@
+---
+description: Promotes modular design within the 'src' directory by organizing code into distinct files for models, services, controllers, and utilities.
+globs: /src/**/*.*
+alwaysApply: false
+---
+- Implement modular design with distinct files for models, services, controllers, and utilities.
