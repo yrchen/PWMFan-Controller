@@ -1,0 +1,8 @@
+{
+    "temperature_to_duty": [
+        {"temp": 40, "duty": 20},
+        {"temp": 50, "duty": 40},
+        {"temp": 60, "duty": 70},
+        {"temp": 70, "duty": 100}
+    ]
+}
