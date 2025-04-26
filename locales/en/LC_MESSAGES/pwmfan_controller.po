@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PWM Fan Controller v1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-26 21:36+0800\n"
+"POT-Creation-Date: 2025-04-26 22:20+0800\n"
 "PO-Revision-Date: 2025-04-26 12:56:20+0800\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@ATCity.org>\n"
 "Language-Team: English <en-team>\n"
@@ -17,140 +17,140 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/pwm_fan_controller.py:63 src/pwm_fan_controller.py:82
+#: src/pwm_fan_controller.py:64 src/pwm_fan_controller.py:86
 #, python-brace-format
 msgid "Sysfs path not found: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:66
+#: src/pwm_fan_controller.py:67
 #, python-brace-format
 msgid "Permission denied reading sysfs path: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:69
+#: src/pwm_fan_controller.py:70
 #, python-brace-format
 msgid "OS error reading sysfs path {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:72
+#: src/pwm_fan_controller.py:74
 #, python-brace-format
 msgid "Unexpected error reading sysfs path {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:85
+#: src/pwm_fan_controller.py:89
 #, python-brace-format
 msgid "Permission denied writing to sysfs path: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:88
+#: src/pwm_fan_controller.py:92
 #, python-brace-format
 msgid "OS error writing to sysfs path {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:91
+#: src/pwm_fan_controller.py:96
 #, python-brace-format
 msgid "Unexpected error writing to sysfs path {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:101
+#: src/pwm_fan_controller.py:108
 #, python-brace-format
 msgid "Invalid PWM period value read from {path}: {value}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:102
+#: src/pwm_fan_controller.py:109
 msgid "PWM period must be positive"
 msgstr ""
 
-#: src/pwm_fan_controller.py:106
+#: src/pwm_fan_controller.py:114
 #, python-brace-format
 msgid ""
 "Non-integer value read for PWM period from {path}. Value: '{value}'. Error: "
 "{error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:116
+#: src/pwm_fan_controller.py:128
 #, python-format, python-brace-format
 msgid "Duty cycle percent {percent}% out of range (0-100), clamping."
 msgstr ""
 
-#: src/pwm_fan_controller.py:119
+#: src/pwm_fan_controller.py:131
 #, python-brace-format
 msgid "Cannot set duty cycle with invalid period: {period}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:128
+#: src/pwm_fan_controller.py:140
 #, python-brace-format
 msgid "Failed to set duty cycle on {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:140
+#: src/pwm_fan_controller.py:154
 #, python-brace-format
 msgid ""
 "Non-integer value read for temperature from {path}: {value}. Error: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:144
+#: src/pwm_fan_controller.py:161
 #, python-brace-format
 msgid "Failed to read temperature from {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:159
+#: src/pwm_fan_controller.py:178
 #, python-brace-format
 msgid "Successfully loaded and merged configuration file: {config_file}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:162
+#: src/pwm_fan_controller.py:183
 #, python-brace-format
 msgid ""
 "Configuration file {config_file} not found, using default configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:164
+#: src/pwm_fan_controller.py:189
 #, python-brace-format
 msgid ""
 "Permission denied reading configuration file: {config_file}, using default "
 "configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:166
+#: src/pwm_fan_controller.py:195
 #, python-brace-format
 msgid ""
 "Error decoding JSON configuration file {config_file}: {error}, using default "
 "configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:168
+#: src/pwm_fan_controller.py:201
 #, python-brace-format
 msgid ""
 "Unexpected error loading configuration file {config_file}, using default "
 "configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:178
+#: src/pwm_fan_controller.py:215
 #, python-brace-format
 msgid ""
 "Configuration error: '{key}' must be a string, but got {type}. Using default."
 msgstr ""
 
-#: src/pwm_fan_controller.py:183
+#: src/pwm_fan_controller.py:223
 #, python-brace-format
 msgid "Configured path for '{key}' does not exist: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:189
+#: src/pwm_fan_controller.py:231
 #, python-brace-format
 msgid ""
 "Configuration error: 'interval' must be a positive integer, but got {value}. "
 "Using default {default}."
 msgstr ""
 
-#: src/pwm_fan_controller.py:196
+#: src/pwm_fan_controller.py:240
 msgid ""
 "Configuration error: 'temperature_to_duty' must be a non-empty list. Using "
 "default curve."
 msgstr ""
 
-#: src/pwm_fan_controller.py:204
+#: src/pwm_fan_controller.py:255
 #, python-brace-format
 msgid ""
 "Configuration error: Invalid rule at index {index} in 'temperature_to_duty': "
@@ -158,262 +158,262 @@ msgid ""
 "default curve."
 msgstr ""
 
-#: src/pwm_fan_controller.py:213
+#: src/pwm_fan_controller.py:266
 #, python-brace-format
 msgid "Error sorting temperature curve: {error}. Using default curve."
 msgstr ""
 
-#: src/pwm_fan_controller.py:218
+#: src/pwm_fan_controller.py:272
 #, python-brace-format
 msgid ""
 "Configuration loaded from {config_file} contained errors. Using defaults for "
 "invalid entries."
 msgstr ""
 
-#: src/pwm_fan_controller.py:220
+#: src/pwm_fan_controller.py:277
 msgid "Using default configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:222
+#: src/pwm_fan_controller.py:279
 msgid "Configuration validated successfully."
 msgstr ""
 
-#: src/pwm_fan_controller.py:229
+#: src/pwm_fan_controller.py:287
 msgid "Cannot determine duty cycle because temperature reading failed."
 msgstr ""
 
-#: src/pwm_fan_controller.py:233
+#: src/pwm_fan_controller.py:291
 msgid "Attempted to use empty temperature curve!"
 msgstr ""
 
-#: src/pwm_fan_controller.py:246
+#: src/pwm_fan_controller.py:304
 #, python-brace-format
 msgid "Malformed rule in curve (missing 'temp' or 'duty'): {rule}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:249
+#: src/pwm_fan_controller.py:307
 #, python-brace-format
 msgid "Non-numeric 'temp' or 'duty' in curve rule: {rule}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:263
+#: src/pwm_fan_controller.py:322
 #, python-brace-format
 msgid ""
 "PWM is not enabled (read {value} from {path}). Please ensure PWM is exported "
 "and enabled."
 msgstr ""
 
-#: src/pwm_fan_controller.py:268
+#: src/pwm_fan_controller.py:331
 #, python-brace-format
 msgid ""
 "Non-integer value read for PWM enable status from {path}: {value}. Error: "
 "{error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:272
+#: src/pwm_fan_controller.py:338
 #, python-brace-format
 msgid "PWM enable file not found at {path}. Cannot check PWM status."
 msgstr ""
 
-#: src/pwm_fan_controller.py:276
+#: src/pwm_fan_controller.py:342
 #, python-brace-format
 msgid "Failed to check PWM status at {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:287
+#: src/pwm_fan_controller.py:354
 msgid "Starting Auto Mode with configuration:"
 msgstr ""
 
-#: src/pwm_fan_controller.py:301
+#: src/pwm_fan_controller.py:369
 #, python-brace-format
 msgid "Could not get initial mtime for config file {config_file}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:309
+#: src/pwm_fan_controller.py:380
 msgid "Initial PWM check failed. Auto mode cannot run."
 msgstr ""
 
-#: src/pwm_fan_controller.py:313
+#: src/pwm_fan_controller.py:384
 #, python-brace-format
 msgid "PWM initialized. Period: {period} ns"
 msgstr ""
 
-#: src/pwm_fan_controller.py:316
+#: src/pwm_fan_controller.py:388
 #, python-brace-format
 msgid "Failed to read initial PWM period from {path}. Auto mode cannot run."
 msgstr ""
 
-#: src/pwm_fan_controller.py:321
+#: src/pwm_fan_controller.py:394
 msgid "PWM initialization failed. Exiting auto mode."
 msgstr ""
 
-#: src/pwm_fan_controller.py:327
+#: src/pwm_fan_controller.py:399
 msgid "Auto mode loop iteration started."
 msgstr ""
 
-#: src/pwm_fan_controller.py:339
+#: src/pwm_fan_controller.py:412
 #, python-brace-format
 msgid "Could not get mtime for config file {config_file}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:342
+#: src/pwm_fan_controller.py:418
 msgid "Configuration file change detected, reloading configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:346
+#: src/pwm_fan_controller.py:422
 msgid "Re-initializing PWM due to config change."
 msgstr ""
 
-#: src/pwm_fan_controller.py:348
+#: src/pwm_fan_controller.py:424
 msgid "Failed to re-initialize PWM after config reload. Skipping cycle."
 msgstr ""
 
-#: src/pwm_fan_controller.py:354
+#: src/pwm_fan_controller.py:430
 msgid "PWM re-initialized successfully."
 msgstr ""
 
-#: src/pwm_fan_controller.py:358
+#: src/pwm_fan_controller.py:435
 #, python-brace-format
 msgid "PWM period not valid ({period}), attempting re-initialization."
 msgstr ""
 
-#: src/pwm_fan_controller.py:360
+#: src/pwm_fan_controller.py:438
 msgid "Failed to re-initialize PWM period. Skipping cycle."
 msgstr ""
 
-#: src/pwm_fan_controller.py:364
+#: src/pwm_fan_controller.py:442
 msgid "PWM period still invalid after re-initialization. Skipping cycle."
 msgstr ""
 
-#: src/pwm_fan_controller.py:374
+#: src/pwm_fan_controller.py:454
 #, python-brace-format
 msgid ""
 "Temperature read failed ({consecutive_read_errors}/"
 "{max_consecutive_read_errors} consecutive errors)."
 msgstr ""
 
-#: src/pwm_fan_controller.py:376
+#: src/pwm_fan_controller.py:461
 msgid "Exceeded maximum consecutive temperature read errors. Exiting."
 msgstr ""
 
-#: src/pwm_fan_controller.py:388
+#: src/pwm_fan_controller.py:473
 msgid "Failed to calculate duty cycle. Skipping update."
 msgstr ""
 
-#: src/pwm_fan_controller.py:395
+#: src/pwm_fan_controller.py:481
 #, python-brace-format
 msgid "Temperature: {temp:.1f}°C => Calculated duty cycle: {duty}%"
 msgstr ""
 
-#: src/pwm_fan_controller.py:398
+#: src/pwm_fan_controller.py:487
 #, python-brace-format
 msgid ""
 "Temperature {temp:.1f}°C triggers change: Updating duty cycle from {old_duty}"
 "% to {new_duty}%."
 msgstr ""
 
-#: src/pwm_fan_controller.py:407
+#: src/pwm_fan_controller.py:498
 #, python-brace-format
 msgid "Unexpected error in auto mode main loop: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:418
+#: src/pwm_fan_controller.py:510
 #, python-brace-format
 msgid "PWM Fan Smart Controller (loads config from {config_file})"
 msgstr ""
 
-#: src/pwm_fan_controller.py:425
+#: src/pwm_fan_controller.py:517
 msgid "Show program's version number and exit"
 msgstr ""
 
-#: src/pwm_fan_controller.py:427
+#: src/pwm_fan_controller.py:519
 msgid "Select mode: auto or manual"
 msgstr ""
 
-#: src/pwm_fan_controller.py:429
+#: src/pwm_fan_controller.py:522
 msgid "Enable verbose logging output (overrides config setting)"
 msgstr ""
 
-#: src/pwm_fan_controller.py:443
+#: src/pwm_fan_controller.py:538
 #, python-brace-format
 msgid "Invalid log_level '{log_level_name}' in config. Using WARNING."
 msgstr ""
 
-#: src/pwm_fan_controller.py:455
+#: src/pwm_fan_controller.py:552
 #, python-brace-format
 msgid "Logging initialized. Effective level: {level_name}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:459
+#: src/pwm_fan_controller.py:560
 #, python-brace-format
 msgid "Received signal {signal_name} ({signal_number}), terminating program."
 msgstr ""
 
-#: src/pwm_fan_controller.py:477
+#: src/pwm_fan_controller.py:581
 msgid "Starting Manual Mode"
 msgstr ""
 
-#: src/pwm_fan_controller.py:483
+#: src/pwm_fan_controller.py:587
 msgid "PWM check failed. Manual mode cannot run."
 msgstr ""
 
-#: src/pwm_fan_controller.py:486
+#: src/pwm_fan_controller.py:590
 #, python-brace-format
 msgid "PWM initialized for manual mode. Period: {period} ns"
 msgstr ""
 
-#: src/pwm_fan_controller.py:488
+#: src/pwm_fan_controller.py:592
 msgid "Failed to initialize PWM for manual mode. Exiting."
 msgstr ""
 
-#: src/pwm_fan_controller.py:493
+#: src/pwm_fan_controller.py:597
 msgid "Set duty cycle (%) or 'quit' > "
 msgstr ""
 
-#: src/pwm_fan_controller.py:495
+#: src/pwm_fan_controller.py:599
 msgid "Exiting manual mode."
 msgstr ""
 
-#: src/pwm_fan_controller.py:499
+#: src/pwm_fan_controller.py:603
 #, python-brace-format
 msgid "Manually setting duty cycle to {percent}%."
 msgstr ""
 
-#: src/pwm_fan_controller.py:501
+#: src/pwm_fan_controller.py:605
 msgid "Invalid input. Please enter a number (0-100) or 'quit'."
 msgstr ""
 
-#: src/pwm_fan_controller.py:503
+#: src/pwm_fan_controller.py:607
 msgid "EOF received, exiting manual mode."
 msgstr ""
 
-#: src/pwm_fan_controller.py:506
+#: src/pwm_fan_controller.py:610
 msgid "Keyboard interrupt during input, exiting manual mode."
 msgstr ""
 
-#: src/pwm_fan_controller.py:509
+#: src/pwm_fan_controller.py:613
 #, python-brace-format
 msgid "Error in manual mode input loop: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:512
+#: src/pwm_fan_controller.py:616
 #, python-brace-format
 msgid "Invalid mode selected: {mode}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:515
+#: src/pwm_fan_controller.py:619
 msgid "Program finished."
 msgstr ""
 
-#: src/pwm_fan_controller.py:522
+#: src/pwm_fan_controller.py:627
 #, python-brace-format
 msgid "Exiting with code {code}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:525
+#: src/pwm_fan_controller.py:630
 msgid "Keyboard interrupt detected during initialization/shutdown."
 msgstr ""
 
-#: src/pwm_fan_controller.py:529
+#: src/pwm_fan_controller.py:634
 msgid "Unhandled exception during program execution!"
 msgstr ""
