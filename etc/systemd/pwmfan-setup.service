@@ -1,0 +1,11 @@
+[Unit]
+Description=Setup PWM Fan Controller prerequisites at boot
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/pwmfan_setup.sh
+
+[Install]
+WantedBy=multi-user.target

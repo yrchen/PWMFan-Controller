@@ -4,9 +4,9 @@
 
 ## 前置需求 (Prerequisites)
 
-在安裝和執行此程式之前，您需要確保系統已啟用硬體 PWM 功能，並且對應的 sysfs 介面已匯出。
+在安裝和執行此程式之前，您需要確保系統底層的硬體 PWM 功能已透過系統設定啟用。程式安裝時會包含一個設定服務 (`pwmfan-setup.service`)，它會嘗試在每次開機時匯出並啟用所需的 PWM 通道，但底層的啟用步驟仍需手動完成。
 
-### 在 Raspberry Pi 上啟用 PWM
+### 在 Raspberry Pi 上啟用 PWM (必要步驟)
 
 1.  **編輯設定檔:** 開啟 `/boot/config.txt` (或新版系統的 `/boot/firmware/config.txt`) 檔案：
     ```shell
@@ -22,28 +22,22 @@
         ```
         dtoverlay=pwm-2chan
         ```
-    *   **注意:** 此程式預設使用 `pwm0`，通常對應 GPIO 12 或 GPIO 18。請根據您的硬體接線選擇正確的引腳和設定。
+    *   **注意:** 此程式預設使用 `pwm0` (可透過 `/etc/pwmfan_setup.ini` 設定)。請根據您的硬體接線選擇正確的引腳和設定。
 3.  **儲存並重啟:** 儲存檔案 (Ctrl+O, Enter) 並離開 (Ctrl+X)，然後重新啟動 Raspberry Pi：
     ```shell
     sudo reboot
     ```
-4.  **驗證 (可選):** 重啟後，檢查 `/sys/class/pwm/pwmchip0/` 目錄是否存在。如果存在，並且裡面有 `export` 檔案，表示 PWM 介面已成功載入。
+4.  **驗證 (可選):** 重啟後，檢查 `/sys/class/pwm/` 下對應的 `pwmchipX` 目錄是否存在。例如，如果使用 `pwmchip0`，應檢查 `/sys/class/pwm/pwmchip0/` 是否存在。
 
-### 匯出 PWM 通道 (如果需要)
+### PWM 通道匯出與啟用 (由 Setup Service 自動處理)
 
-通常 `dtoverlay` 會自動匯出 PWM 通道。但如果 `/sys/class/pwm/pwmchip0/pwm0` 目錄不存在，您可能需要手動匯出：
+上述 `dtoverlay` 步驟完成並重啟後，系統應能辨識 PWM 硬體。本專案包含的 `pwmfan-setup.service` 會在開機時執行 `pwmfan_setup.sh` 腳本。此腳本會：
+1.  讀取 `/etc/pwmfan_setup.ini` 設定檔以獲取 PWM chip 路徑和 PWM 編號。
+2.  檢查對應的 PWM 通道 (例如 `/sys/class/pwm/pwmchip0/pwm0`) 是否已匯出。如果沒有，則嘗試匯出。
+3.  設定 PWM 的週期 (period) 和初始工作週期 (duty cycle)。
+4.  啟用 (enable) 該 PWM 通道。
 
-```shell
-echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
-```
-
-確認 `/sys/class/pwm/pwmchip0/pwm0` 目錄出現後，您還需要確保它是啟用的：
-
-```shell
-echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
-```
-
-**注意:** 此程式 (`pwm_fan_controller.py`) 預設會檢查 `pwm0` 是否存在且已啟用。
+因此，一般情況下您**不需要**再手動執行 `echo 0 > .../export` 或 `echo 1 > .../enable` 等指令。
 
 ## 安裝
 
@@ -54,21 +48,64 @@ chmod +x install.sh
 ./install.sh
 ```
 
+安裝腳本會將主程式、設定腳本、範例設定檔以及兩個 systemd 服務檔安裝到系統中。
+
 ## 功能
 - 自動溫控轉速
 - 支援手動即時調整
 - 支援 systemd 開機自動啟動
 - 支援外部設定檔
+- 自動處理 PWM 通道匯出與初始設定
+
+## 系統服務與執行流程
+
+本專案包含兩個 systemd 服務：
+
+1.  **`pwmfan-setup.service`**:
+    *   類型：`oneshot` (執行一次性任務)。
+    *   執行腳本：`/usr/local/bin/pwmfan_setup.sh`。
+    *   目的：在開機過程中，確保 PWM 通道已匯出、設定好週期/工作週期並已啟用。
+    *   設定檔：讀取 `/etc/pwmfan_setup.ini`。
+2.  **`pwmfan.service`**:
+    *   類型：`simple` (主要執行的 daemon)。
+    *   執行腳本：`/usr/local/bin/pwm_fan_controller.py`。
+    *   目的：根據 CPU 溫度持續監控並調整 PWM 風扇轉速。
+    *   設定檔：讀取 `/etc/pwmfan_config.json`。
+    *   **依賴關係：** 此服務設定為在 `pwmfan-setup.service` 成功執行**之後**才會啟動 (`After=` 和 `Requires=`)，以確保 PWM 介面準備就緒。
+
+**執行順序:** 開機 -> `pwmfan-setup.service` 執行 -> `pwmfan.service` 執行。
 
 ## 設定檔
 
-編輯 `/etc/pwmfan_config.json` 自訂溫控曲線。
+本專案使用兩個主要的設定檔：
+
+1.  **`/etc/pwmfan_setup.ini`**:
+    *   用途：設定 PWM 硬體相關參數，供 `pwmfan_setup.sh` 腳本讀取。
+    *   內容：包含 `PWMCHIP_PATH` (PWM 控制器路徑)、`PWM_NUMBER` (使用的 PWM 編號)、`DEFAULT_PERIOD` (週期) 和 `DEFAULT_DUTY_CYCLE` (初始工作週期)。
+    *   安裝時若此檔案不存在，會從專案的 `etc/` 目錄複製範例檔案。
+2.  **`/etc/pwmfan_config.json`**:
+    *   用途：設定風扇轉速與 CPU 溫度的對應關係 (溫控曲線)，供主程式 `pwm_fan_controller.py` 讀取。
+    *   格式：JSON。
+    *   安裝時若此檔案不存在，會從專案的 `etc/` 目錄複製範例檔案。
 
 ## 監控
-```shell
-sudo systemctl status pwmfan.service
-sudo journalctl -u pwmfan.service -f
-```
+
+*   **檢查主服務狀態:**
+    ```shell
+    sudo systemctl status pwmfan.service
+    ```
+*   **查看主服務即時日誌:**
+    ```shell
+    sudo journalctl -u pwmfan.service -f
+    ```
+*   **檢查設定服務狀態 (通常會是 inactive (dead)，因為是 oneshot):**
+    ```shell
+    sudo systemctl status pwmfan-setup.service
+    ```
+*   **查看設定服務的執行日誌 (用於除錯 PWM 初始設定問題):**
+    ```shell
+    sudo journalctl -u pwmfan-setup.service
+    ```
 
 ## 多語系支援 (Localization)
 

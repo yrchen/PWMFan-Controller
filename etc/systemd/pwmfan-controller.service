@@ -1,6 +1,7 @@
 [Unit]
 Description=PWM Fan Controller Service
-After=multi-user.target
+Requires=pwmfan-setup.service
+After=multi-user.target pwmfan-setup.service
 
 [Service]
 Type=simple
