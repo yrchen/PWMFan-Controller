@@ -8,6 +8,9 @@ import os
 import signal
 import time
 
+# Version Information
+__version__ = "1.0.1"
+
 # Setup localization
 APP_NAME = "pwmfan_controller"
 # Assume locales dir is one level up from src/, adjust if needed for installation
@@ -194,7 +197,16 @@ def auto_mode(initial_config):
 
 def main():
     # Use _() for translatable strings in argparse descriptions and help text
-    parser = argparse.ArgumentParser(description=_("PWM Fan Smart Controller (loads config from {config_file})").format(config_file=CONFIG_FILE))
+    parser = argparse.ArgumentParser(
+        description=_("PWM Fan Smart Controller (loads config from {config_file})").format(config_file=CONFIG_FILE),
+        prog=APP_NAME # Use APP_NAME for program name in help/version
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'%(prog)s {__version__}', # Display program name and version
+        help=_("Show program's version number and exit")
+    )
     parser.add_argument("--mode", choices=["auto", "manual"], default="auto", help=_("Select mode: auto or manual"))
     # Removed --interval argument
     parser.add_argument("--verbose", action="store_true", help=_("Enable verbose logging output (overrides config setting)"))
