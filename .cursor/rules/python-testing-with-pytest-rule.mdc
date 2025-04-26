@@ -1,0 +1,6 @@
+---
+description: Specifies comprehensive testing practices using pytest within the 'tests' directory to ensure code reliability and quality.
+globs: /tests/**/*.*
+alwaysApply: false
+---
+- Use pytest for comprehensive testing.

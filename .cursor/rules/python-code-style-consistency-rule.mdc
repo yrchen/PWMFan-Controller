@@ -1,0 +1,6 @@
+---
+description: Ensures code style consistency using Ruff for Python files to maintain a clean and uniform codebase.
+globs: /**/*.py
+alwaysApply: false
+---
+- Enforce code style consistency using Ruff.
