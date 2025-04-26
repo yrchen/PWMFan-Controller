@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Version Information
+__version__="1.0.6"
+
 # Default configuration file path
 CONFIG_FILE="/etc/pwmfan_setup.ini"
 
