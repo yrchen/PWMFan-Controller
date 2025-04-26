@@ -5,7 +5,7 @@ After=multi-user.target pwmfan-setup.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/local/bin/pwm_fan_controller.py --mode auto --verbose
+ExecStart=/usr/bin/python3 /usr/local/bin/pwmfan_controller.py --mode auto --verbose
 Restart=on-failure
 RestartSec=5
 StandardOutput=journal
