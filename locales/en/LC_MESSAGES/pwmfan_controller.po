@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PWM Fan Controller v1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-26 16:43+0800\n"
+"POT-Creation-Date: 2025-04-26 21:14+0800\n"
 "PO-Revision-Date: 2025-04-26 12:56:20+0800\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@ATCity.org>\n"
 "Language-Team: English <en-team>\n"
@@ -17,161 +17,174 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/pwm_fan_controller.py:56
+#: src/pwm_fan_controller.py:61
 #, python-brace-format
 msgid "Failed to read PWM period from {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:68
+#: src/pwm_fan_controller.py:73
 #, python-brace-format
 msgid "Failed to set duty cycle at {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:79
+#: src/pwm_fan_controller.py:84
 #, python-brace-format
 msgid "Failed to read temperature from {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:94
+#: src/pwm_fan_controller.py:99
 #, python-brace-format
 msgid "Successfully loaded configuration file: {config_file}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:96
+#: src/pwm_fan_controller.py:101
 #, python-brace-format
 msgid ""
 "Configuration file {config_file} not found, using default configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:98
+#: src/pwm_fan_controller.py:103
 #, python-brace-format
 msgid ""
 "Error decoding configuration file {config_file}: {error}, using default "
 "configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:100
+#: src/pwm_fan_controller.py:105
 #, python-brace-format
 msgid ""
 "Failed to load configuration file {config_file}: {error}, using default "
 "configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:104
+#: src/pwm_fan_controller.py:109
 #, python-brace-format
 msgid "Configured PWM path does not exist: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:106
+#: src/pwm_fan_controller.py:111
 #, python-brace-format
 msgid "Configured temperature sensor path does not exist: {path}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:123
+#: src/pwm_fan_controller.py:128
 #, python-brace-format
 msgid "PWM is not enabled (enable file is not 1 at {path})"
 msgstr ""
 
-#: src/pwm_fan_controller.py:126
+#: src/pwm_fan_controller.py:131
 #, python-brace-format
 msgid "PWM enable file not found at {path}. Ensure PWM is exported."
 msgstr ""
 
-#: src/pwm_fan_controller.py:130
+#: src/pwm_fan_controller.py:135
 #, python-brace-format
 msgid "Failed to check PWM status at {path}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:140
+#: src/pwm_fan_controller.py:145
 msgid "Starting Auto Mode"
 msgstr ""
 
-#: src/pwm_fan_controller.py:150
+#: src/pwm_fan_controller.py:148
+msgid "Auto mode loop iteration started."
+msgstr ""
+
+#: src/pwm_fan_controller.py:156
 #, python-brace-format
 msgid "Could not get mtime for config file {config_file}: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:153
+#: src/pwm_fan_controller.py:159
 msgid "Configuration file change detected, reloading configuration."
 msgstr ""
 
-#: src/pwm_fan_controller.py:160 src/pwm_fan_controller.py:225
+#: src/pwm_fan_controller.py:166 src/pwm_fan_controller.py:241
 #, python-brace-format
 msgid "PWM period: {period} ns"
 msgstr ""
 
-#: src/pwm_fan_controller.py:162
+#: src/pwm_fan_controller.py:168
 #, python-brace-format
 msgid "Failed to re-initialize PWM after config reload: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:169
+#: src/pwm_fan_controller.py:175
 #, python-brace-format
 msgid "PWM period not valid ({period}), skipping cycle."
 msgstr ""
 
-#: src/pwm_fan_controller.py:178
+#: src/pwm_fan_controller.py:184
 #, python-brace-format
 msgid "Temperature: {temp:.1f}°C => Calculated duty cycle: {duty}%"
 msgstr ""
 
-#: src/pwm_fan_controller.py:183
+#: src/pwm_fan_controller.py:189
 #, python-brace-format
 msgid "Updating duty cycle to {duty}%"
 msgstr ""
 
-#: src/pwm_fan_controller.py:188
+#: src/pwm_fan_controller.py:194
 #, python-brace-format
 msgid "Error in auto mode: {error}"
 msgstr ""
 
-#: src/pwm_fan_controller.py:196
+#: src/pwm_fan_controller.py:203
 #, python-brace-format
 msgid "PWM Fan Smart Controller (loads config from {config_file})"
 msgstr ""
 
-#: src/pwm_fan_controller.py:197
+#: src/pwm_fan_controller.py:210
+msgid "Show program's version number and exit"
+msgstr ""
+
+#: src/pwm_fan_controller.py:212
 msgid "Select mode: auto or manual"
 msgstr ""
 
-#: src/pwm_fan_controller.py:199
+#: src/pwm_fan_controller.py:214
 msgid "Enable verbose logging output (overrides config setting)"
 msgstr ""
 
-#: src/pwm_fan_controller.py:218
+#: src/pwm_fan_controller.py:228
+#, python-format
+msgid "Logging initialized. Effective level: %s"
+msgstr ""
+
+#: src/pwm_fan_controller.py:234
 #, python-brace-format
 msgid ""
 "PWM device path configured in {config_file} not found: {path}. Please ensure "
 "the path is correct and pwm0 is exported!"
 msgstr ""
 
-#: src/pwm_fan_controller.py:228
+#: src/pwm_fan_controller.py:244
 #, python-brace-format
 msgid "Failed to initialize PWM device at {path}. Exiting."
 msgstr ""
 
-#: src/pwm_fan_controller.py:233
+#: src/pwm_fan_controller.py:249
 msgid "Received interrupt signal, terminating program."
 msgstr ""
 
-#: src/pwm_fan_controller.py:243
+#: src/pwm_fan_controller.py:259
 msgid "Starting Manual Mode"
 msgstr ""
 
-#: src/pwm_fan_controller.py:247
+#: src/pwm_fan_controller.py:263
 msgid "Set duty cycle (%) > "
 msgstr ""
 
-#: src/pwm_fan_controller.py:251
+#: src/pwm_fan_controller.py:267
 #, python-brace-format
 msgid "Manually setting duty cycle to {percent}%"
 msgstr ""
 
-#: src/pwm_fan_controller.py:254
+#: src/pwm_fan_controller.py:270
 msgid "Please enter a valid number!"
 msgstr ""
 
-#: src/pwm_fan_controller.py:257
+#: src/pwm_fan_controller.py:273
 #, python-brace-format
 msgid "Error in manual mode: {error}"
 msgstr ""
