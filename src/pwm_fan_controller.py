@@ -9,7 +9,7 @@ import signal
 import time
 
 # Version Information
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 # Setup localization
 APP_NAME = "pwmfan_controller"
