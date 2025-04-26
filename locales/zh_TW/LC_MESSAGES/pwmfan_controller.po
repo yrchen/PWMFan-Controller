@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PWM Fan Controller v1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-26 16:43+0800\n"
+"POT-Creation-Date: 2025-04-26 21:14+0800\n"
 "PO-Revision-Date: 2025-04-26 12:56:20+0800\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@ATCity.org>\n"
 "Language-Team: Chinese (Taiwan) <zh-tw-team>\n"
@@ -17,162 +17,177 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/pwm_fan_controller.py:56
+#: src/pwm_fan_controller.py:61
 #, fuzzy, python-brace-format
 msgid "Failed to read PWM period from {path}: {error}"
 msgstr "檢查 PWM 狀態失敗: {error}"
 
-#: src/pwm_fan_controller.py:68
+#: src/pwm_fan_controller.py:73
 #, fuzzy, python-brace-format
 msgid "Failed to set duty cycle at {path}: {error}"
 msgstr "檢查 PWM 狀態失敗: {error}"
 
-#: src/pwm_fan_controller.py:79
+#: src/pwm_fan_controller.py:84
 #, fuzzy, python-brace-format
 msgid "Failed to read temperature from {path}: {error}"
 msgstr "檢查 PWM 狀態失敗: {error}"
 
-#: src/pwm_fan_controller.py:94
+#: src/pwm_fan_controller.py:99
 #, python-brace-format
 msgid "Successfully loaded configuration file: {config_file}"
 msgstr "成功載入設定檔 {CONFIG_FILE}"
 
-#: src/pwm_fan_controller.py:96
+#: src/pwm_fan_controller.py:101
 #, fuzzy, python-brace-format
 msgid ""
 "Configuration file {config_file} not found, using default configuration."
 msgstr "設定檔缺少 'temperature_to_duty'，使用預設曲線"
 
-#: src/pwm_fan_controller.py:98
+#: src/pwm_fan_controller.py:103
 #, fuzzy, python-brace-format
 msgid ""
 "Error decoding configuration file {config_file}: {error}, using default "
 "configuration."
 msgstr "讀取設定檔失敗: {error}，使用預設曲線"
 
-#: src/pwm_fan_controller.py:100
+#: src/pwm_fan_controller.py:105
 #, fuzzy, python-brace-format
 msgid ""
 "Failed to load configuration file {config_file}: {error}, using default "
 "configuration."
 msgstr "讀取設定檔失敗: {error}，使用預設曲線"
 
-#: src/pwm_fan_controller.py:104
+#: src/pwm_fan_controller.py:109
 #, python-brace-format
 msgid "Configured PWM path does not exist: {path}"
 msgstr "設定 PWM 路徑不存在: {path}"
 
-#: src/pwm_fan_controller.py:106
+#: src/pwm_fan_controller.py:111
 #, python-brace-format
 msgid "Configured temperature sensor path does not exist: {path}"
 msgstr "設定溫度感測器路徑不存在: {path}"
 
-#: src/pwm_fan_controller.py:123
+#: src/pwm_fan_controller.py:128
 #, fuzzy, python-brace-format
 msgid "PWM is not enabled (enable file is not 1 at {path})"
 msgstr "PWM 未啟用 (enable 檔案不是 1)"
 
-#: src/pwm_fan_controller.py:126
+#: src/pwm_fan_controller.py:131
 #, fuzzy, python-brace-format
 msgid "PWM enable file not found at {path}. Ensure PWM is exported."
 msgstr "PWM 設備未找到。請確保 pwm0 已經導出並啟用！"
 
-#: src/pwm_fan_controller.py:130
+#: src/pwm_fan_controller.py:135
 #, fuzzy, python-brace-format
 msgid "Failed to check PWM status at {path}: {error}"
 msgstr "檢查 PWM 狀態失敗: {error}"
 
-#: src/pwm_fan_controller.py:140
+#: src/pwm_fan_controller.py:145
 msgid "Starting Auto Mode"
 msgstr "開始自動模式"
 
-#: src/pwm_fan_controller.py:150
+#: src/pwm_fan_controller.py:148
+msgid "Auto mode loop iteration started."
+msgstr "自動模式循環開始"
+
+#: src/pwm_fan_controller.py:156
 #, python-brace-format
 msgid "Could not get mtime for config file {config_file}: {error}"
 msgstr "無法取得設定檔 {config_file} 的 mtime: {error}"
 
-#: src/pwm_fan_controller.py:153
+#: src/pwm_fan_controller.py:159
 msgid "Configuration file change detected, reloading configuration."
 msgstr "偵測到設定檔變更，重新載入設定。"
 
-#: src/pwm_fan_controller.py:160 src/pwm_fan_controller.py:225
+#: src/pwm_fan_controller.py:166 src/pwm_fan_controller.py:241
 #, python-brace-format
 msgid "PWM period: {period} ns"
 msgstr "PWM 週期: {period} ns"
 
-#: src/pwm_fan_controller.py:162
+#: src/pwm_fan_controller.py:168
 #, python-brace-format
 msgid "Failed to re-initialize PWM after config reload: {error}"
 msgstr "重新載入設定後無法重新初始化 PWM: {error}"
 
-#: src/pwm_fan_controller.py:169
+#: src/pwm_fan_controller.py:175
 #, python-brace-format
 msgid "PWM period not valid ({period}), skipping cycle."
 msgstr "PWM 週期無效 ({period})，跳過週期。"
 
-#: src/pwm_fan_controller.py:178
+#: src/pwm_fan_controller.py:184
 #, fuzzy, python-brace-format
 msgid "Temperature: {temp:.1f}°C => Calculated duty cycle: {duty}%"
 msgstr "溫度: {temp:.1f}°C => 應設定轉速 {duty}%"
 
-#: src/pwm_fan_controller.py:183
+#: src/pwm_fan_controller.py:189
 #, python-brace-format
 msgid "Updating duty cycle to {duty}%"
 msgstr "更新轉速至 {duty}%"
 
-#: src/pwm_fan_controller.py:188
+#: src/pwm_fan_controller.py:194
 #, python-brace-format
 msgid "Error in auto mode: {error}"
 msgstr "自動模式錯誤: {error}"
 
-#: src/pwm_fan_controller.py:196
+#: src/pwm_fan_controller.py:203
 #, fuzzy, python-brace-format
 msgid "PWM Fan Smart Controller (loads config from {config_file})"
 msgstr "PWM 風扇智能控制器 (自動載入設定)"
 
-#: src/pwm_fan_controller.py:197
+#: src/pwm_fan_controller.py:210
+msgid "Show program's version number and exit"
+msgstr "顯示程式版本號並退出"
+
+#: src/pwm_fan_controller.py:212
 msgid "Select mode: auto or manual"
 msgstr "選擇模式: auto 或 manual"
 
-#: src/pwm_fan_controller.py:199
+#: src/pwm_fan_controller.py:214
 #, fuzzy
 msgid "Enable verbose logging output (overrides config setting)"
 msgstr "啟用詳細日誌輸出"
 
-#: src/pwm_fan_controller.py:218
+#: src/pwm_fan_controller.py:228
+#, python-format
+msgid "Logging initialized. Effective level: %s"
+msgstr "日誌初始化完成。有效日誌等級: %s"
+
+#: src/pwm_fan_controller.py:234
 #, python-brace-format
 msgid ""
 "PWM device path configured in {config_file} not found: {path}. Please ensure "
 "the path is correct and pwm0 is exported!"
-msgstr "設定檔 {config_file} 中配置的 PWM 設備路徑不存在: {path}。請確保路徑正確且 pwm0 已經導出！"
+msgstr ""
+"設定檔 {config_file} 中配置的 PWM 設備路徑不存在: {path}。請確保路徑正確且 "
+"pwm0 已經導出！"
 
-#: src/pwm_fan_controller.py:228
+#: src/pwm_fan_controller.py:244
 #, python-brace-format
 msgid "Failed to initialize PWM device at {path}. Exiting."
 msgstr "無法初始化 PWM 設備: {path}。退出程式。"
 
-#: src/pwm_fan_controller.py:233
+#: src/pwm_fan_controller.py:249
 msgid "Received interrupt signal, terminating program."
 msgstr "收到中斷信號，終止程式。"
 
-#: src/pwm_fan_controller.py:243
+#: src/pwm_fan_controller.py:259
 msgid "Starting Manual Mode"
 msgstr "開始手動模式"
 
-#: src/pwm_fan_controller.py:247
+#: src/pwm_fan_controller.py:263
 msgid "Set duty cycle (%) > "
 msgstr "請輸入轉速 (%) > "
 
-#: src/pwm_fan_controller.py:251
+#: src/pwm_fan_controller.py:267
 #, python-brace-format
 msgid "Manually setting duty cycle to {percent}%"
 msgstr "手動設定轉速至 {percent}%"
 
-#: src/pwm_fan_controller.py:254
+#: src/pwm_fan_controller.py:270
 msgid "Please enter a valid number!"
 msgstr "請輸入有效的數字！"
 
-#: src/pwm_fan_controller.py:257
+#: src/pwm_fan_controller.py:273
 #, python-brace-format
 msgid "Error in manual mode: {error}"
 msgstr "手動模式錯誤: {error}"

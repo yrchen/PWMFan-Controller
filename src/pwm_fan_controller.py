@@ -145,6 +145,7 @@ def auto_mode(initial_config):
     logging.info(_("Starting Auto Mode"))
 
     while True:
+        logging.info(_("Auto mode loop iteration started."))
         try:
             # Check for configuration file updates
             current_mtime = 0
@@ -224,6 +225,7 @@ def main():
     )
     # Log the effective config being used (optional, consider redacting sensitive info if any)
     # logging.info(f"Effective configuration: {config}") # Be careful logging full config
+    logging.info(_("Logging initialized. Effective level: %s"), logging.getLevelName(logging.getLogger().getEffectiveLevel()))
 
     pwm_path = config["pwm_path"] # Get path from loaded config
 
