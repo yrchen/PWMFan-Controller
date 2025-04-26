@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/usr/local/bin/pwm_fan_setup.sh
+ExecStart=/usr/local/bin/pwmfan_setup.sh
 
 [Install]
 WantedBy=multi-user.target
