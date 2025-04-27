@@ -1,6 +1,13 @@
+[English Version](README.en.md)
+
 # PWM Fan Controller
 
 根據 CPU 溫度自動調整 PWM 風扇轉速的小型 daemon 程式，適用(但不限於) Raspberry Pi 裝置。
+
+## 測試環境
+
+本專案已經在下列軟硬體環境測試可正常執行：
+* Raspberry Pi 4 Model B 與 [Argon POLY+ Raspberry Pi 4 Vented Case with PWM 30mm Fan](https://argon40.com/products/draft-argon-poly-raspberry-pi-4-vented-case-with-pwm-30mm-fan) 於 Raspberry Pi OS (bookworm)
 
 ## 前置需求 (Prerequisites)
 
