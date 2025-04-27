@@ -545,7 +545,7 @@ def main():
 
     logging.basicConfig(
         level=level,
-        format="%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d] %(message)s",  # Added filename/lineno
+        format="[%(levelname)s] %(filename)s:%(lineno)d] %(message)s",  # Removed %(asctime)s
         force=True,  # Force re-configuration if basicConfig was called implicitly before
     )
     logging.info(
