@@ -10,7 +10,7 @@ import sys  # Import sys for exit
 import time
 
 # Version Information
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 # Setup localization
 APP_NAME = "pwmfan_controller"
