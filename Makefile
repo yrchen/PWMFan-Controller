@@ -2,7 +2,7 @@
 
 # Variables
 APP_NAME = pwmfan_controller
-SOURCE_FILE = src/pwm_fan_controller.py
+SOURCE_FILE = src/pwmfan_controller.py
 POT_FILE = locales/$(APP_NAME).pot
 LANGUAGES = en zh_TW # Add more language codes here if needed
 PO_FILES = $(foreach lang,$(LANGUAGES),locales/$(lang)/LC_MESSAGES/$(APP_NAME).po)
@@ -40,4 +40,4 @@ translate: update-po mo
 clean:
 	@echo "Cleaning generated localization files..."
 	rm -f $(POT_FILE)
-	rm -f $(MO_FILES) 
+	rm -f $(MO_FILES)

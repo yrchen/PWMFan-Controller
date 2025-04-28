@@ -1,9 +1,12 @@
 {
   "pwm_chip_path": "/sys/class/pwm/pwmchip0",
   "pwm_path": "/sys/class/pwm/pwmchip0/pwm0",
-  "temp_sensor_path": "/sys/class/thermal/thermal_zone0/temp",
+  "temp_sensor_paths": [
+    "/sys/class/thermal/thermal_zone0/temp"
+  ],
   "interval": 10,
   "verbose": true,
+  "log_level": "WARNING",
   "temperature_to_duty": [
     {"temp": 45, "duty": 0},
     {"temp": 50, "duty": 10},
@@ -11,4 +14,4 @@
     {"temp": 60, "duty": 80},
     {"temp": 65, "duty": 100}
   ]
-} 
+}

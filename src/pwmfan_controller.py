@@ -10,7 +10,7 @@ import sys  # Import sys for exit
 import time
 
 # Version Information
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 # Setup localization
 APP_NAME = "pwmfan_controller"
@@ -35,14 +35,16 @@ _ = lang.gettext  # Assign the translation function
 
 # Configuration file path
 CONFIG_FILE = "/etc/pwmfan_config.json"
+RASPBERRY_PI_MODEL_PATH = "/sys/firmware/devicetree/base/model"
 
 # Default configuration values
 DEFAULT_CONFIG = {
     "pwm_chip_path": "/sys/class/pwm/pwmchip0",
     "pwm_path": "/sys/class/pwm/pwmchip0/pwm0",
-    "temp_sensor_path": "/sys/class/thermal/thermal_zone0/temp",
+    "temp_sensor_paths": ["/sys/class/thermal/thermal_zone0/temp"],
     "interval": 10,
     "verbose": True,
+    "log_level": "WARNING",
     "temperature_to_duty": [
         {"temp": 45, "duty": 0},
         {"temp": 50, "duty": 10},
@@ -131,6 +133,14 @@ def set_duty_cycle(percent, period, pwm_path):
         logging.error(_("Cannot set duty cycle with invalid period: {period}").format(period=period))
         return  # Or raise an error, depending on desired behavior
 
+    # --- Check if PWM is enabled before writing ---
+    if not check_pwm_enabled(pwm_path):
+        logging.warning(
+            _("Attempted to set duty cycle while PWM is not enabled for {path}. Skipping write.").format(path=pwm_path)
+        )
+        return
+    # --- End check ---
+
     duty_ns = int(period * (percent / 100.0))
     try:
         write_sysfs_value(duty_cycle_path, duty_ns)
@@ -141,104 +151,219 @@ def set_duty_cycle(percent, period, pwm_path):
         # Not re-raising here to potentially allow the loop to continue
 
 
-# Read CPU temperature (°C)
-def read_temperature(temp_sensor_path):
-    try:
-        value = read_sysfs_value(temp_sensor_path)
-        temp_milli = int(value)
-        temperature = temp_milli / 1000.0
-        logging.debug(f"Read temperature: {temperature}°C from {temp_sensor_path}")
-        return temperature
-    except ValueError as e:
-        logging.error(
-            _("Non-integer value read for temperature from {path}: {value}. Error: {error}").format(
-                path=temp_sensor_path, value=value, error=e
+# Read CPU temperature (°C) - Now handles multiple paths and returns max temp
+def read_temperature(temp_sensor_paths):
+    """Reads temperatures from a list of sysfs paths and returns the maximum valid temperature."""
+    max_temp = -float("inf")  # Initialize with negative infinity
+    valid_temp_found = False
+    read_errors = 0
+
+    for temp_sensor_path in temp_sensor_paths:
+        try:
+            value = read_sysfs_value(temp_sensor_path)  # Handles FileNotFoundError, PermissionError etc.
+            temp_milli = int(value)
+            temperature = temp_milli / 1000.0
+            logging.debug(f"Read temperature: {temperature}°C from {temp_sensor_path}")
+            max_temp = max(max_temp, temperature)
+            valid_temp_found = True
+        except ValueError as e:
+            logging.error(
+                _("Non-integer value read for temperature from {path}: {value}. Error: {error}").format(
+                    path=temp_sensor_path, value=value, error=e
+                )
             )
+            read_errors += 1
+        except (FileNotFoundError, PermissionError, OSError):
+            # Error already logged by read_sysfs_value
+            logging.warning(
+                _("Failed to read temperature from {path}, skipping this sensor.").format(path=temp_sensor_path)
+            )
+            read_errors += 1
+        except Exception:
+            # Error already logged by read_sysfs_value
+            logging.error(
+                _("Unexpected error reading temperature from {path}, skipping.").format(path=temp_sensor_path)
+            )
+            read_errors += 1
+
+    if not valid_temp_found:
+        logging.error(
+            _("Failed to read any valid temperature from configured paths: {paths}").format(paths=temp_sensor_paths)
         )
-        return None  # Return None to indicate failure but allow continuation
-    except Exception:
-        # Error already logged by read_sysfs_value
-        logging.error(_("Failed to read temperature from {path}").format(path=temp_sensor_path))
-        return None  # Return None to indicate failure
+        return None  # Return None if no paths were readable
+
+    logging.debug(f"Maximum temperature from {temp_sensor_paths}: {max_temp}°C")
+    return max_temp
 
 
 # Load configuration file
 def load_config():
-    config = DEFAULT_CONFIG.copy()  # Start with defaults
+    """Loads configuration, applying hardware detection defaults first."""
+    # --- Hardware Detection ---
+    detected_model = detect_raspberry_pi_model()
+    adjusted_default_config = DEFAULT_CONFIG.copy()  # Start with base defaults
+
+    if detected_model and "Raspberry Pi 5" in detected_model:
+        logging.info(_("Detected Raspberry Pi 5. Adjusting default temperature sensors."))
+        rpi5_potential_zones = [
+            "/sys/class/thermal/thermal_zone0/temp",  # CPU
+            "/sys/class/thermal/thermal_zone1/temp",  # GPU? PMIC? (Depends on kernel/dt)
+            "/sys/class/thermal/thermal_zone2/temp",  # PMIC? GPU? (Depends on kernel/dt)
+            # Add more zones if necessary for RPi 5 variants
+        ]
+        rpi5_existing_zones = [p for p in rpi5_potential_zones if os.path.exists(p)]
+        if rpi5_existing_zones:
+            adjusted_default_config["temp_sensor_paths"] = rpi5_existing_zones
+            logging.info(_("Using RPi 5 default temp sensors: {paths}").format(paths=rpi5_existing_zones))
+        else:
+            logging.warning(
+                _("Detected RPi 5, but could not find expected additional thermal zones. Using base default.")
+            )
+    # Add logic here for other Pi models if needed (e.g., RPi 4 specific defaults)
+    elif detected_model:
+        logging.info(_("Detected {model}. Using standard default temperature sensor.").format(model=detected_model))
+    else:
+        logging.info(_("Could not detect specific Raspberry Pi model. Using standard default settings."))
+
+    # --- Load User Configuration File ---
+    # Start config with the (potentially hardware-adjusted) defaults
+    config = adjusted_default_config
     config_loaded_successfully = False
+    user_config_data = {}
+
     try:
-        logging.debug(f"Attempting to load configuration from: {CONFIG_FILE}")
+        logging.debug(f"Attempting to load user configuration from: {CONFIG_FILE}")
         with open(CONFIG_FILE, "r") as f:
-            data = json.load(f)
-            logging.debug(f"Raw data loaded from config file: {data}")
-            # Update config with values from file, keeping defaults if keys are missing
-            config.update(data)
+            user_config_data = json.load(f)
+            logging.debug(f"Raw data loaded from config file: {user_config_data}")
             config_loaded_successfully = True
             logging.info(
-                _("Successfully loaded and merged configuration file: {config_file}").format(config_file=CONFIG_FILE)
+                _("Successfully loaded user configuration file: {config_file}").format(config_file=CONFIG_FILE)
             )
+            # Update the adjusted defaults with user settings (user settings take priority)
+            config.update(user_config_data)
+            logging.debug("Merged user config with defaults.")
 
     except FileNotFoundError:
         logging.warning(
-            _("Configuration file {config_file} not found, using default configuration.").format(
-                config_file=CONFIG_FILE
-            )
+            _(
+                "User configuration file {config_file} not found. Using default configuration (potentially adjusted for hardware)."
+            ).format(config_file=CONFIG_FILE)
         )
     except PermissionError:
         logging.error(
-            _("Permission denied reading configuration file: {config_file}, using default configuration.").format(
+            _("Permission denied reading user configuration file: {config_file}. Using defaults.").format(
                 config_file=CONFIG_FILE
             )
         )
     except json.JSONDecodeError as e:
         logging.error(
-            _("Error decoding JSON configuration file {config_file}: {error}, using default configuration.").format(
+            _("Error decoding JSON user configuration file {config_file}: {error}. Using defaults.").format(
                 config_file=CONFIG_FILE, error=e
             )
         )
     except Exception:
         logging.exception(
-            _("Unexpected error loading configuration file {config_file}, using default configuration.").format(
+            _("Unexpected error loading user configuration file {config_file}. Using defaults.").format(
                 config_file=CONFIG_FILE
             )
         )
 
     # --- Configuration Validation ---
-    logging.debug(f"Validating configuration: {config}")
+    logging.debug(f"Validating final configuration: {config}")
     is_config_valid = True
+    # Base default to compare against if user config had issues
+    fallback_config = adjusted_default_config
 
-    # Validate paths (must be string and exist)
-    for key in ["pwm_path", "temp_sensor_path"]:
-        path_val = config.get(key)
-        if not isinstance(path_val, str):
-            logging.error(
-                _("Configuration error: '{key}' must be a string, but got {type}. Using default.").format(
-                    key=key, type=type(path_val).__name__
+    # Validate pwm_path
+    pwm_key = "pwm_path"
+    path_val = config.get(pwm_key)
+    if not isinstance(path_val, str):
+        logging.error(
+            _("Config Error: '{key}' must be a string, but got {type}. Falling back to default: {fallback}").format(
+                key=pwm_key, type=type(path_val).__name__, fallback=fallback_config[pwm_key]
+            )
+        )
+        config[pwm_key] = fallback_config[pwm_key]
+        is_config_valid = False
+    else:
+        pwm_dir = os.path.dirname(path_val)
+        pwm_chip_dir = os.path.dirname(pwm_dir)  # Go one level higher for pwmchip path
+        if not os.path.isdir(pwm_chip_dir):
+            logging.warning(
+                _("Parent PWM chip directory for '{key}' does not exist: {path}. PWM might not be available.").format(
+                    key=pwm_key, path=pwm_chip_dir
                 )
             )
-            config[key] = DEFAULT_CONFIG[key]  # Fallback to default
-            is_config_valid = False
         elif not os.path.exists(path_val):
-            # This might be okay if the device appears later, so use warning
-            logging.warning(_("Configured path for '{key}' does not exist: {path}").format(key=key, path=path_val))
-            # No fallback here, let subsequent checks handle it
+            logging.warning(
+                _("Configured path for '{key}' does not exist: {path}. It might need to be exported.").format(
+                    key=pwm_key, path=path_val
+                )
+            )
 
-    # Validate interval (must be positive integer)
-    interval_val = config.get("interval")
+    # Validate temp_sensor_paths
+    temp_key = "temp_sensor_paths"
+    paths_val = config.get(temp_key)
+    if not isinstance(paths_val, list) or not paths_val:
+        logging.error(
+            _("Config Error: '{key}' must be a non-empty list of strings. Falling back to default: {fallback}").format(
+                key=temp_key, fallback=fallback_config[temp_key]
+            )
+        )
+        config[temp_key] = fallback_config[temp_key]
+        is_config_valid = False
+    else:
+        valid_paths = []
+        for i, path in enumerate(paths_val):
+            if not isinstance(path, str):
+                logging.error(
+                    _(
+                        "Config Error: Item at index {index} in '{key}' is not a string: {value}. Skipping this path."
+                    ).format(index=i, key=temp_key, value=path)
+                )
+                # Don't mark config as invalid here, just skip the entry if others exist
+                continue  # Skip this invalid path entry
+            elif not os.path.exists(path):
+                logging.warning(_("Configured path in '{key}' does not exist: {path}").format(key=temp_key, path=path))
+            valid_paths.append(path)  # Add even non-existent paths, read_temperature will handle errors
+
+        if not valid_paths:
+            logging.error(
+                _(
+                    "Config Error: '{key}' contains no valid or existing paths after filtering. Falling back to default: {fallback}"
+                ).format(key=temp_key, fallback=fallback_config[temp_key])
+            )
+            config[temp_key] = fallback_config[temp_key]
+            is_config_valid = False
+        elif len(valid_paths) < len(paths_val):
+            # If some user-provided paths were skipped due to type error
+            if config_loaded_successfully and temp_key in user_config_data:
+                logging.warning(
+                    _("Some paths provided by user in '{key}' were invalid and skipped.").format(key=temp_key)
+                )
+            config[temp_key] = valid_paths  # Update config with only the valid string paths
+
+    # Validate interval
+    interval_key = "interval"
+    interval_val = config.get(interval_key)
     if not isinstance(interval_val, int) or interval_val <= 0:
         logging.error(
             _(
-                "Configuration error: 'interval' must be a positive integer, but got {value}. Using default {default}."
-            ).format(value=interval_val, default=DEFAULT_CONFIG["interval"])
+                "Config Error: '{key}' must be a positive integer, but got {value}. Falling back to default: {fallback}"
+            ).format(key=interval_key, value=interval_val, fallback=fallback_config[interval_key])
         )
-        config["interval"] = DEFAULT_CONFIG["interval"]
+        config[interval_key] = fallback_config[interval_key]
         is_config_valid = False
 
-    # Validate temperature curve (must be list of dicts with temp/duty numbers)
-    curve = config.get("temperature_to_duty")
+    # Validate temperature curve
+    curve_key = "temperature_to_duty"
+    curve = config.get(curve_key)
     if not isinstance(curve, list) or not curve:
-        logging.error(_("Configuration error: 'temperature_to_duty' must be a non-empty list. Using default curve."))
-        config["temperature_to_duty"] = DEFAULT_CONFIG["temperature_to_duty"]
+        logging.error(
+            _("Config Error: '{key}' must be a non-empty list. Falling back to default curve.").format(key=curve_key)
+        )
+        config[curve_key] = fallback_config[curve_key]
         is_config_valid = False
     else:
         for i, rule in enumerate(curve):
@@ -252,31 +377,35 @@ def load_config():
             ):
                 logging.error(
                     _(
-                        "Configuration error: Invalid rule at index {index} in 'temperature_to_duty': {rule}. Rule must be a dict with numeric 'temp' and 'duty' (0-100). Using default curve."
-                    ).format(index=i, rule=rule)
+                        "Config Error: Invalid rule at index {index} in '{key}': {rule}. Falling back to default curve."
+                    ).format(index=i, key=curve_key, rule=rule)
                 )
-                config["temperature_to_duty"] = DEFAULT_CONFIG["temperature_to_duty"]
+                config[curve_key] = fallback_config[curve_key]
                 is_config_valid = False
                 break  # Stop checking curve rules
         else:  # If loop completed without break
             try:
-                config["temperature_to_duty"].sort(key=lambda x: x["temp"])
+                config[curve_key].sort(key=lambda x: x["temp"])
                 logging.debug("Temperature curve sorted.")
             except Exception as e:
-                logging.error(_("Error sorting temperature curve: {error}. Using default curve.").format(error=e))
-                config["temperature_to_duty"] = DEFAULT_CONFIG["temperature_to_duty"]
+                logging.error(
+                    _("Error sorting temperature curve: {error}. Falling back to default curve.").format(error=e)
+                )
+                config[curve_key] = fallback_config[curve_key]
                 is_config_valid = False
 
+    # --- Final Logging ---
     if config_loaded_successfully and not is_config_valid:
         logging.warning(
-            _("Configuration loaded from {config_file} contained errors. Using defaults for invalid entries.").format(
+            _("User configuration from {config_file} contained errors. Used defaults for invalid entries.").format(
                 config_file=CONFIG_FILE
             )
         )
     elif not config_loaded_successfully:
-        logging.info(_("Using default configuration."))
-    else:
-        logging.info(_("Configuration validated successfully."))
+        # Already logged warning about missing file, maybe just info here
+        logging.info(_("Using default configuration (potentially adjusted for hardware)."))
+    else:  # Loaded successfully and validated (or user settings were valid)
+        logging.info(_("Configuration loaded and validated successfully."))
 
     return config
 
@@ -344,6 +473,7 @@ def check_pwm_enabled(pwm_path):
 
 
 def auto_mode(initial_config):
+    """Runs the fan controller in automatic mode based on temperature."""
     config = initial_config
     last_config_mtime = 0
     last_duty = -1
@@ -353,7 +483,7 @@ def auto_mode(initial_config):
 
     logging.info(_("Starting Auto Mode with configuration:"))
     # Log key config values safely
-    for key in ["pwm_path", "temp_sensor_path", "interval", "verbose"]:
+    for key in ["pwm_path", "temp_sensor_paths", "interval", "log_level"]:  # Updated keys
         logging.info(f"  {key}: {config.get(key)}")
     logging.info(f"  temperature_to_duty: {config.get('temperature_to_duty')}")
 
@@ -399,7 +529,7 @@ def auto_mode(initial_config):
         logging.debug(_("Auto mode loop iteration started."))  # Changed level to DEBUG
         interval = config.get("interval", 10)  # Get interval for this iteration
         pwm_path = config["pwm_path"]
-        temp_sensor_path = config["temp_sensor_path"]
+        temp_sensor_paths = config["temp_sensor_paths"]  # Use list of paths
 
         try:
             # Check for configuration file updates
@@ -444,7 +574,7 @@ def auto_mode(initial_config):
                     continue
 
             # --- Read Temperature and Set Duty Cycle ---
-            temp = read_temperature(temp_sensor_path)
+            temp = read_temperature(temp_sensor_paths)  # Pass the list of paths
 
             if temp is None:
                 # Failed to read temperature (error logged in read_temperature)
@@ -504,10 +634,78 @@ def auto_mode(initial_config):
         time.sleep(interval)
 
 
+def manual_mode(initial_config):
+    """Runs the fan controller in manual mode, allowing user input."""
+    logging.info(_("Starting Manual Mode"))
+    # Use the validated config from main()
+    config = initial_config
+    pwm_path = config["pwm_path"]
+    period = -1
+    # Initialize PWM for manual mode
+    try:
+        if not check_pwm_enabled(pwm_path):
+            logging.error(_("PWM check failed. Manual mode cannot run."))
+            sys.exit(1)
+        period = read_period(pwm_path)
+        logging.info(_("PWM initialized for manual mode. Period: {period} ns").format(period=period))
+    except Exception:
+        # Error logged in called functions
+        logging.critical(_("Failed to initialize PWM for manual mode. Exiting.").format(path=pwm_path))
+        sys.exit(1)
+
+    # Input loop
+    while True:
+        try:
+            user_input = input(_("Set duty cycle (%) or 'quit' > "))
+            cmd = user_input.strip().lower()
+            if cmd == "quit":
+                logging.info(_("Exiting manual mode."))
+                break
+            # Allow setting 0% duty cycle
+            percent = float(cmd)
+            # Validation happens inside set_duty_cycle (clamping)
+            set_duty_cycle(percent, period, pwm_path)
+            # Log the clamped value if possible, or just the requested value
+            logging.info(_("Manually setting duty cycle towards {percent}%.").format(percent=percent))
+
+        except ValueError:
+            print(_("Invalid input. Please enter a number (0-100) or 'quit'."))
+        except EOFError:  # Handle Ctrl+D
+            logging.info(_("EOF received, exiting manual mode."))
+            break
+        except KeyboardInterrupt:  # Handle Ctrl+C during input
+            logging.info(_("Keyboard interrupt during input, exiting manual mode."))
+            break
+        except Exception as e:
+            logging.exception(_("Error in manual mode input loop: {error}").format(error=e))
+
+
+def detect_raspberry_pi_model():
+    """Detects the Raspberry Pi model by reading the device tree."""
+    try:
+        model_str = read_sysfs_value(RASPBERRY_PI_MODEL_PATH)
+        # The model string might contain null characters, strip them
+        model_str_cleaned = model_str.replace("\x00", "").strip()
+        logging.debug(f"Detected Raspberry Pi model: {model_str_cleaned}")
+        return model_str_cleaned
+    except (FileNotFoundError, PermissionError, OSError):
+        logging.warning(
+            _("Could not read Raspberry Pi model from {path}. Hardware detection unavailable.").format(
+                path=RASPBERRY_PI_MODEL_PATH
+            )
+        )
+        return None
+    except Exception:
+        logging.exception(
+            _("Unexpected error detecting Raspberry Pi model from {path}.").format(path=RASPBERRY_PI_MODEL_PATH)
+        )
+        return None
+
+
 def main():
     # Use _() for translatable strings in argparse descriptions and help text
     parser = argparse.ArgumentParser(
-        description=_("PWM Fan Smart Controller (loads config from {config_file})").format(config_file=CONFIG_FILE),
+        description=_("PWM Fan Smart Controller (config: {config_file})").format(config_file=CONFIG_FILE),
         prog=APP_NAME,  # Use APP_NAME for program name in help/version
     )
     parser.add_argument(
@@ -519,15 +717,17 @@ def main():
     parser.add_argument("--mode", choices=["auto", "manual"], default="auto", help=_("Select mode: auto or manual"))
     # Removed --interval argument
     parser.add_argument(
-        "--verbose", action="store_true", help=_("Enable verbose logging output (overrides config setting)")
+        "--verbose",
+        action="store_true",
+        help=_("Enable verbose logging output (overrides config log_level to INFO)"),  # Clarified help
     )
     args = parser.parse_args()
 
-    # --- Initial Configuration Load ---
-    # Load configuration first - errors handled and logged within load_config
+    # --- Initial Configuration Load & Validation ---
+    # load_config() now incorporates hardware detection defaults
     config = load_config()
 
-    # --- Setup Logging ---
+    # --- Logging Setup ---
     # Allow command line verbose to override config OR default
     log_level_name = config.get("log_level", "WARNING").upper()  # Allow setting log level in config
     try:
@@ -542,10 +742,13 @@ def main():
     # Command line --verbose overrides to INFO
     if args.verbose:
         level = logging.INFO
+        log_format = "[%(levelname)s %(filename)s:%(lineno)d] %(message)s"  # More detail if verbose
+    else:
+        log_format = "[%(levelname)s] %(message)s"  # Simpler format for normal operation
 
     logging.basicConfig(
         level=level,
-        format="%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d] %(message)s",  # Added filename/lineno
+        format=log_format,  # Use selected format
         force=True,  # Force re-configuration if basicConfig was called implicitly before
     )
     logging.info(
@@ -553,6 +756,29 @@ def main():
             level_name=logging.getLevelName(logging.getLogger().getEffectiveLevel())
         )
     )
+
+    # --- RPi Firmware Warning ---
+    # Keep the existing warning based on thermal zones found in the *final* config
+    try:
+        # Check based on the final loaded config's temp paths
+        final_temp_paths = config.get("temp_sensor_paths", [])
+        has_multiple_zones = (
+            len(final_temp_paths) > 1
+            or any("thermal_zone1" in p for p in final_temp_paths)
+            or os.path.exists("/sys/class/thermal/thermal_zone1")
+        )
+
+        if has_multiple_zones and "Raspberry Pi 5" in (detect_raspberry_pi_model() or ""):
+            # Show warning only if multiple zones detected AND it looks like an RPi 5
+            logging.warning("-----------------------------------------------------")
+            logging.warning(_("Multiple thermal zones detected (potentially Raspberry Pi 5 or similar)."))
+            logging.warning(
+                _("If using the official Raspberry Pi Active Cooler, fan control might be handled by the firmware.")
+            )
+            logging.warning(_("This script might conflict or have no effect in that case."))
+            logging.warning("-----------------------------------------------------")
+    except Exception as e:
+        logging.debug(f"Could not perform RPi 5 check: {e}")
 
     # --- Signal Handling ---
     def signal_handler(sig, frame):
@@ -574,45 +800,12 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
     logging.debug("Signal handlers registered for SIGINT and SIGTERM.")
 
-    # --- Mode Selection ---
+    # --- Mode Dispatch ---
     if args.mode == "auto":
-        auto_mode(config)
+        auto_mode(config)  # Pass the final validated config
     elif args.mode == "manual":
-        logging.info(_("Starting Manual Mode"))
-        # Manual mode needs initial PWM setup too
-        pwm_path = config["pwm_path"]
-        period = -1
-        try:
-            if not check_pwm_enabled(pwm_path):
-                logging.error(_("PWM check failed. Manual mode cannot run."))
-                sys.exit(1)
-            period = read_period(pwm_path)
-            logging.info(_("PWM initialized for manual mode. Period: {period} ns").format(period=period))
-        except Exception:
-            logging.error(_("Failed to initialize PWM for manual mode. Exiting.").format(path=pwm_path))
-            sys.exit(1)
-
-        while True:
-            try:
-                user_input = input(_("Set duty cycle (%) or 'quit' > "))
-                if user_input.strip().lower() == "quit":
-                    logging.info(_("Exiting manual mode."))
-                    break
-                percent = float(user_input.strip())
-                set_duty_cycle(percent, period, pwm_path)  # Error handling inside
-                logging.info(_("Manually setting duty cycle to {percent}%.").format(percent=percent))
-            except ValueError:
-                print(_("Invalid input. Please enter a number (0-100) or 'quit'."))
-            except EOFError:  # Handle Ctrl+D
-                logging.info(_("EOF received, exiting manual mode."))
-                break
-            except KeyboardInterrupt:  # Handle Ctrl+C during input
-                logging.info(_("Keyboard interrupt during input, exiting manual mode."))
-                break
-            except Exception as e:
-                logging.exception(_("Error in manual mode input loop: {error}").format(error=e))
+        manual_mode(config)  # Pass the final validated config
     else:
-        # Should not happen due to argparse choices
         logging.error(_("Invalid mode selected: {mode}").format(mode=args.mode))
         sys.exit(1)
 
@@ -620,6 +813,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # --- Global Exception Handling ---
     try:
         main()
     except SystemExit as e:
