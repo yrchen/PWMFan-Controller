@@ -2,7 +2,7 @@
 set -e
 
 # Version Information
-__version__="1.0.7"
+__version__="1.0.8"
 
 # Default configuration file path
 CONFIG_FILE="/etc/pwmfan_setup.ini"
